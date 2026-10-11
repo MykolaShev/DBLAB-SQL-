@@ -1,0 +1,6 @@
+# Binaries
+/app
+*.exe
+
+# Environment variables
+.env
