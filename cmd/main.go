@@ -5,14 +5,24 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"freelance-platform/internal/store"
 )
 
 func main() {
-	connStr := "user=postgres password=secret dbname=freelance sslmode=disable"
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: No .env file found, relying on system environment variables")
+	}
+
+	connStr := os.Getenv("DB_CONN_STR")
+	if connStr == "" {
+		log.Fatal("DB_CONN_STR environment variable is not set")
+	}
+
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
@@ -26,16 +36,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to start transaction: %v", err)
 	}
-
-	// Defer rollback ensures atomic consistency.
-	// If uow.Commit() succeeds, calling Rollback() afterward does nothing.
 	defer uow.Rollback()
 
 	// Business Logic Scenario: Accept proposal and update project
 	
 	proposalID := 1
 	projectID := 1
-	clientID := 2 // ID of the user performing the action
+	clientID := 2 
 
 	fmt.Println("Step 1: Accepting proposal and generating contract...")
 	err = uow.Proposals().AcceptProposal(ctx, proposalID, clientID, "2026-10-15", "2026-11-15")
@@ -49,16 +56,13 @@ func main() {
 		log.Fatalf("Error updating project status: %v", err)
 	}
 
-	// Commit transaction if all operations succeed
 	if err := uow.Commit(); err != nil {
 		log.Fatalf("Failed to commit transaction: %v", err)
 	}
-
 	fmt.Println("Success! Transaction committed.")
 
-	// Fetching Read-Only Data (via Views)
+	// Fetching Read-Only Data
 	
-	// Create a new short-lived transaction for reading
 	readUow, _ := store.NewUnitOfWork(ctx, db)
 	defer readUow.Rollback()
 
