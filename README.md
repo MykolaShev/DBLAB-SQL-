@@ -76,7 +76,7 @@ This repository contains the database design, SQL scripts, and a Golang backend 
 3. Run the application to test the database transaction scenario:
 
    ```bash
-   go run cmd/app/main.go
+   go run cmd/main.go
    ```
 
 ## Architecture Notes
