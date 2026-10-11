@@ -67,11 +67,11 @@ This repository contains the database design, SQL scripts, and a Golang backend 
    go mod tidy
    ```
 
-2. Update the database connection string in `cmd/app/main.go` if your local PostgreSQL credentials differ:
-
-   ```go
-   connStr := "user=postgres password=secret dbname=freelance sslmode=disable"
+2. Define .env by 
    ```
+   copy .env.example .env
+   ```
+   and indicate correct password for your db
 
 3. Run the application to test the database transaction scenario:
 
